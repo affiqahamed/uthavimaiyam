@@ -1,0 +1,224 @@
+Experiment 1: UDP Message Transfer — Server to Client
+Aim: To send a message from the server and display it on the client.
+Server — UDPServer.java
+import java.net.*;
+
+class UDPServer {
+    public static void main(String[] args) throws Exception {
+        DatagramSocket ds = new DatagramSocket();
+
+        String msg = "Hello Client";
+        byte[] data = msg.getBytes();
+
+        DatagramPacket p = new DatagramPacket(
+            data, data.length,
+            InetAddress.getByName("localhost"), 2050);
+
+        ds.send(p);
+        System.out.println("Message sent");
+
+        ds.close();
+    }
+}
+
+
+Client — UDPClient.java
+import java.net.*;
+
+class UDPClient {
+    public static void main(String[] args) throws Exception {
+        DatagramSocket ds = new DatagramSocket(2050);
+
+        byte[] data = new byte[1024];
+        DatagramPacket p = new DatagramPacket(data, data.length);
+
+        System.out.println("Waiting for message...");
+        ds.receive(p);
+
+        String msg = new String(p.getData(), 0, p.getLength());
+        System.out.println("Message: " + msg);
+
+        ds.close();
+    }
+}
+
+
+Output
+
+Server:
+Message sent
+
+
+Client:
+Waiting for message...
+Message: Hello Client
+
+
+Execution: Run the client first, then the server.
+
+Experiment 2: UDP Chat
+Aim: To send a message from the client to the server and display it on the server.
+Server — UDPChatServer.java
+import java.net.*;
+
+class UDPChatServer {
+    public static void main(String[] args) throws Exception {
+        DatagramSocket ds = new DatagramSocket(2050);
+
+        byte[] data = new byte[1024];
+        DatagramPacket p = new DatagramPacket(data, data.length);
+
+        System.out.println("Server waiting...");
+        ds.receive(p);
+
+        String msg = new String(p.getData(), 0, p.getLength());
+        System.out.println("Client says: " + msg);
+
+        ds.close();
+    }
+}
+
+
+Client — UDPChatClient.java
+import java.net.*;
+import java.util.Scanner;
+
+class UDPChatClient {
+    public static void main(String[] args) throws Exception {
+        DatagramSocket ds = new DatagramSocket();
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Enter message: ");
+        String msg = sc.nextLine();
+        byte[] data = msg.getBytes();
+
+        DatagramPacket p = new DatagramPacket(
+            data, data.length,
+            InetAddress.getByName("localhost"), 2050);
+
+        ds.send(p);
+        ds.close();
+        sc.close();
+    }
+}
+
+
+Output
+
+Server:
+Server waiting...
+Client says: Hello Server
+
+
+Client:
+Enter message: Hello Server
+
+
+Execution: Run the server first, then the client.
+
+This is a simple one-way chat demonstration, not a continuous two-way chat.
+
+Experiment 3: UDP Time Server
+Aim: To send the current date and time from the server to the client.
+Server — UDPTimeServer.java
+import java.net.*;
+import java.util.Date;
+
+class UDPTimeServer {
+    public static void main(String[] args) throws Exception {
+        DatagramSocket ds = new DatagramSocket();
+
+        String time = new Date().toString();
+        byte[] data = time.getBytes();
+
+        DatagramPacket p = new DatagramPacket(
+            data, data.length,
+            InetAddress.getByName("localhost"), 2050);
+
+        ds.send(p);
+        System.out.println("Time sent: " + time);
+
+        ds.close();
+    }
+}
+
+
+Client — UDPTimeClient.java
+import java.net.*;
+
+class UDPTimeClient {
+    public static void main(String[] args) throws Exception {
+        DatagramSocket ds = new DatagramSocket(2050);
+
+        byte[] data = new byte[1024];
+        DatagramPacket p = new DatagramPacket(data, data.length);
+
+        ds.receive(p);
+
+        String time = new String(p.getData(), 0, p.getLength());
+        System.out.println("Current time: " + time);
+
+        ds.close();
+    }
+}
+
+
+Output
+
+Server:
+Time sent: Tue Oct 20 22:00:00 IST 2026
+
+
+Client:
+Current time: Tue Oct 20 22:00:00 IST 2026
+
+
+The displayed time will depend on when you execute the program.
+
+Execution: Run the client first, then the server.
+
+Experiment 4: UDP Echo Server
+Aim: To receive a message from the client, send the same message back, and display it on the client.
+Server — UDPEchoServer.java
+import java.net.*;
+
+class UDPEchoServer {
+    public static void main(String[] args) throws Exception {
+        DatagramSocket ds = new DatagramSocket(2050);
+
+        byte[] data = new byte[1024];
+        DatagramPacket p = new DatagramPacket(data, data.length);
+
+        System.out.println("Echo Server waiting...");
+        ds.receive(p);
+
+        DatagramPacket reply = new DatagramPacket(
+            p.getData(), p.getLength(),
+            p.getAddress(), p.getPort());
+
+        ds.send(reply);
+        System.out.println("Message echoed");
+
+        ds.close();
+    }
+}
+
+
+Client — UDPEchoClient.java
+import java.net.*;
+import java.util.Scanner;
+
+class UDPEchoClient {
+    public static void main(String[] args) throws Exception {
+        DatagramSocket ds = new DatagramSocket();
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Enter message: ");
+        String msg = sc.nextLine();
+        byte[] data = msg.getBytes();
+
+        DatagramPacket p = new DatagramPacket(
+            data, data.length,
+            InetAddress.getByName("localhost"), 2050);
+
+        ds.send(p);
